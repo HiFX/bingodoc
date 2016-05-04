@@ -19,7 +19,7 @@ const (
 	HEADER_PARAM_TOKEN  = "@headerparam"
 	BODY_PARAM_TOKEN    = "@bodyparam"
 
-	SWAGGER_FORM_PARAM_TOKEN   = "form"
+	SWAGGER_FORM_PARAM_TOKEN   = "formData"
 	SWAGGER_QUERY_PARAM_TOKEN  = "query"
 	SWAGGER_PATH_PARAM_TOKEN   = "path"
 	SWAGGER_HEADER_PARAM_TOKEN = "header"
@@ -127,7 +127,7 @@ func (parser *Parser) ParseRequestParametersIntoStruct(apiFile string) {
 					if si == 0 || ei <= si {
 						continue
 					}
-					description := commentLine[si:ei]
+					description := commentLine[si+1 : ei]
 					commentLine = commentLine[0 : si-1]
 					attributes := strings.Split(commentLine, " ")
 
@@ -195,13 +195,14 @@ func (parser *Parser) GenerateStructFile() error {
 			continue
 		}
 		resourceDetails.WriteString("//" + (*parser.ResourceList[i]).OutputStructName + " represent the struct for rquest parameters for " + (*parser.ResourceList[i]).Route + " endpoint\n")
-		resourceDetails.WriteString("// swagger:model\n")
+		resourceDetails.WriteString("// swagger:parameters " + (*parser.ResourceList[i]).OutputStructName + "\n")
 		resourceDetails.WriteString("type " + (*parser.ResourceList[i]).OutputStructName + " struct {\n\n")
 		for _, param := range (*parser.ResourceList[i]).Parameters {
 			resourceDetails.WriteString("\t//" + param.Description + "\n")
 			if param.IsMandatory {
 				resourceDetails.WriteString("\t// required: true\n")
 			}
+			resourceDetails.WriteString("\t// in: " + param.ParameterType + "\n")
 			resourceDetails.WriteString("\t" + strings.Title(param.Name) + "\t" + param.DataType + "\t`json:\"" + param.Name + "\"`\n\n")
 		}
 		resourceDetails.WriteString("}\n\n")

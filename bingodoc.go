@@ -58,8 +58,16 @@ func main() {
 	defer parser.DeleteStructFile()
 
 	//executing go-swagger
-	cmd := exec.Command("swagger", "generate", "spec", "-o", *output)
-	er := cmd.Run()
+	buildCmd := exec.Command("go", "build")
+	er := buildCmd.Run()
+	if er != nil {
+		fmt.Println("er ", er.Error())
+		os.Exit(1)
+	}
+
+	//executing go-swagger
+	swaggerCmd := exec.Command("swagger", "generate", "spec", "-o", *output)
+	er = swaggerCmd.Run()
 	if er != nil {
 		fmt.Println("er ", er.Error())
 		os.Exit(1)
